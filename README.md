@@ -79,6 +79,33 @@ The system routes reasoning chains to satisfy the core structural assignment con
 - **APPROVED WITH CONDITIONS**: Granted to elevated risk profiles whose metrics trigger warnings, but whose risks are fully mitigated by high-value capital collateral asset backing.
 - **REJECTED**: Denied by automated policy enforcement due to subprime credit scores, explicit past repayment defaults, or crippling debt burden thresholds.
 
+## 4. How the Inference Engine Works
+The engine uses forward chaining 
+```
+[ User Inputs Facts ] 
+               │
+               ▼
+   [ Compute Derived Ratios ] (e.g., LTV calculation)
+               │
+               ▼
+┌───►[ Loop Through Rule List ]
+│              │
+│              ▼
+│     [ Evaluate Conditions ] Using Python's safe scoped string evaluation
+│              │
+│       Is Condition Met? 
+│         ├──► YES: Is the inferred conclusion new?
+│         │            ├──► YES: Add new Fact, log rule to fired paths, flag state change.
+│         │            └──► NO : Skip to prevent redundancy loops.
+│         └──► NO : Skip rule.
+│              │
+│              ▼
+└────  Did ANY rule infer a new fact during this iteration?
+          ├──► YES: Loop again (Reasoning chain continues to progress)
+          └──► NO : Break loop (Stable state achieved, conclusions finalized)
+```
+
+
 ## 4. Explanation Facility
 Whenever a rule's conditions validate successfully during a forward chaining iteration, the engine records that rule into an execution container (`kb.fired_rules`).
 
